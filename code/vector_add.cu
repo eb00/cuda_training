@@ -59,9 +59,9 @@ int main() {
     float *c;
 
     // allocate memory (unified memory on host and GPU) and check allocation is ok
-    checkCuda( cudaMallocManaged(&a, size) );
-    checkCuda( cudaMallocManaged(&b, size) );
-    checkCuda( cudaMallocManaged(&c, size) );
+    checkCuda(cudaMallocManaged(&a, size));
+    checkCuda(cudaMallocManaged(&b, size));
+    checkCuda(cudaMallocManaged(&c, size));
 
     // initialize all vectors
     initWith(3, a, N);
@@ -79,15 +79,15 @@ int main() {
     addVectorsInto<<<numberOfBlocks, threadsPerBlock>>>(c, a, b, N);
 
     // check for errors and synchronize results
-    checkCuda( cudaGetLastError() );
-    checkCuda( cudaDeviceSynchronize() );
+    checkCuda(cudaGetLastError());
+    checkCuda(cudaDeviceSynchronize());
 
     // check results
     checkElementsAre(7, c, N);
 
     // free memory
-    checkCuda( cudaFree(a) );
-    checkCuda( cudaFree(b) );
-    checkCuda( cudaFree(c) );
+    checkCuda(cudaFree(a));
+    checkCuda(cudaFree(b));
+    checkCuda(cudaFree(c));
 }
 
