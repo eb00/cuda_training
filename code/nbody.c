@@ -9,8 +9,10 @@
 
 /*
  * Implementation of the n-body problem in pure c language.
- * compilation with 'gcc nbody.c -o nbody' 
+ * compile with 'gcc nbody.c -o nbody' 
+ * run with ./nbody
  *
+ * written by Eric Bonnet 09/2019
  */
 
 
