@@ -11,6 +11,7 @@
  * Implementation of the n-body problem in pure c language.
  * compile with 'gcc nbody.c -o nbody' 
  * run with ./nbody
+ * performance: 4096 Bodies: average 0.072 Billion Interactions / second (macbook pro 2015 Intel i5)
  *
  * written by Eric Bonnet 09/2019
  */
