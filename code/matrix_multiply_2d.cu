@@ -5,6 +5,7 @@
 /*
  *
  * GPU accelerated matrix multiplication
+ * Compile & run with: nvcc -o -arch=sm_70 -o matrix_multiply_2d matrix_multiply_2d.cu -run
  *
  * written by Eric Bonnet 09/2019
  */
