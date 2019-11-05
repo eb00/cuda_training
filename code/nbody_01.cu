@@ -13,6 +13,8 @@
  * 
  * compilation: nvcc -arch=sm_70 -o nbody nbody_01.cu
  * run with ./nbody 11
+ * optional: profile with 'nvprof ./nbody'
+ *
  * performance: average of 35.099 Billion Interactions / second for 4096 bodies (NVIDIA V100) 
  * CPU: 30 Million Interactions / sec.
  *
