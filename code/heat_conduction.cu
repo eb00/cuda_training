@@ -4,22 +4,29 @@
 // Simple define to index into a 1D array from 2D space
 #define I2D(num, c, r) ((r)*(num)+(c))
 
+
 /*
- * `step_kernel_mod` is currently a direct copy of the CPU reference solution
- * `step_kernel_ref` below. Accelerate it to run as a CUDA kernel.
+ * This application simulates the thermal conduction of silver in 2 dimensional space. 
+ * Here we are using 2D matrix multiplication in GPU to speed up the results.
+ * Compile & run with nvcc -arch=sm_70 -o heat_conduction heat_conduction.cu -run
+ *
+ * written by Eric Bonnet 09/2019
  */
 
+
+
+
+// GPU kernel function for matric multiplication
 __global__ void step_kernel_mod(int ni, int nj, float fact, float* temp_in, float* temp_out) {
 
     int i00, im10, ip10, i0m1, i0p1;
     float d2tdx2, d2tdy2;
+    
     int j = blockIdx.x * blockDim.x + threadIdx.x;
     int i = blockIdx.y * blockDim.y + threadIdx.y;
 
 
     // loop over all points in domain (except boundary)
-    //for ( int j=1; j < nj-1; j++ ) {
-    //    for ( int i=1; i < ni-1; i++ ) {
     if (j > 0 && i > 0 && j < nj-1 && i < ni-1) {
 
             // find indices into linear memory
@@ -39,6 +46,7 @@ __global__ void step_kernel_mod(int ni, int nj, float fact, float* temp_in, floa
     }
 }
 
+// standard C function for matrix multiplication
 void step_kernel_ref(int ni, int nj, float fact, float* temp_in, float* temp_out) {
 
     int i00, im10, ip10, i0m1, i0p1;
@@ -82,8 +90,8 @@ int main() {
 
     temp1_ref = (float*)malloc(size);
     temp2_ref = (float*)malloc(size);
-    //temp1 = (float*)malloc(size);
-    //temp2 = (float*)malloc(size);
+
+    // allocate memory (unified memory) on host and GPU card
     cudaMallocManaged(&temp1, size);
     cudaMallocManaged(&temp2, size);
 
@@ -102,14 +110,17 @@ int main() {
         temp2_ref= temp_tmp;
     }
 
+    // set number of blocks and number of threads per block for GPU
     dim3 threads_per_block(32, 16, 1);
     dim3 number_of_blocks ((nj / threads_per_block.x) + 1, (ni / threads_per_block.y) + 1, 1);
 
     // Execute the modified version using same data
     for (istep=0; istep < nstep; istep++) {
         
+        // call GPU kernel function with appropriate parameters
         step_kernel_mod<<<number_of_blocks, threads_per_block>>>(ni, nj, tfac, temp1, temp2);
 
+        // synchronize results
         cudaDeviceSynchronize();
 
         // swap the temperature pointers
@@ -130,6 +141,7 @@ int main() {
     else
         printf("The Max Error of %.5f is within acceptable bounds.\n", maxError);
 
+    // free memory
     free(temp1_ref);
     free(temp2_ref);
     cudaFree(temp1);
